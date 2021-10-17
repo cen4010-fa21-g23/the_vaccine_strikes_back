@@ -13,6 +13,7 @@ var bullets;
 var bulletQty;
 var bulletIndex;
 var bulletQtyBar;
+var bulletRefill;
 
 //enemy variables
 var enemies;
@@ -39,12 +40,10 @@ var buildVer = "";
 //true if player is using a mobile device
 var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-
 //Don't allow page to be moved or zoomed in on mobile
 function preventBehavior(e) {
     e.preventDefault(); 
 };
-
 document.addEventListener("touchmove", preventBehavior, {passive: false});
 
 p5.disableFriendlyErrors = true; // disable FES for performance
@@ -90,26 +89,34 @@ function setup() {
 	cnv.style('display', 'block');
 	centerCanvas();
 	player = createSprite(width/2, height-(height/8), playerWidth, playerHeight);
+	player.shapeColor = color('white');
 
 	enemies = [];
 	enemyQty = 7;
 
 	for (i = 0; i < enemyQty; i++) {
 		var enemy = createSprite(width/2, 0, 20*spriteScaleFactor, 20*spriteScaleFactor);
+		enemy.shapeColor = color('red');
 		enemies.push(enemy);
 	}
 
 	bullets = [];
-	bulletQty = 100;
+	bulletQty = 50;
 	bulletIndex = 0;
 
 	for (i = 0; i < bulletQty; i++) {
 		var bullet = createSprite(width/2, height, 10*spriteScaleFactor, 10*spriteScaleFactor);
+		bullet.shapeColor = color('cyan');
 		bullet.visible = false;
 		bullets.push(bullet);
 	}
 
+	bulletRefill = createSprite(width/2, 0, 20*spriteScaleFactor, 20*spriteScaleFactor);
+	bulletRefill.shapeColor = color('cyan');
+	bulletRefill.visible = false;
+
 	bulletQtyBar = createSprite(width/2, height, width, 25*spriteScaleFactor);
+	bulletQtyBar.shapeColor = color('cyan');
 }
 
 
@@ -126,13 +133,13 @@ function draw() {
 	}
 
 	if (isGameOver) {
-        gameOver();
+        showStartScreen();
     } 
     else {
 		for (i = 0; i < enemyQty; i++) {
 			if(enemies[i].overlap(player)){
 				isGameOver = true;
-				gameOver();
+				showStartScreen();
 			}
 		}
 		for(i = 0; i < bulletQty; i++){
@@ -145,17 +152,23 @@ function draw() {
 					bullets[i].position.x = width/2; 
 					bullets[i].position.y = height;
 					bullets[i].visible = false;
+
+					score++;
 				}
 			}
+		}
+		if(bulletRefill.overlap(player)){
+			refillBullets();
+			bulletRefill.visible = false;
 		}
 
 		background(0, 0, 51);
 		fill("white");
 		textSize(32*textScaleFactor);
 		textAlign(CENTER, CENTER);
-		text(Math.floor(score/10), width / 2, height/15);
+		text(score, width / 2, height/15);
 		textSize(16*textScaleFactor);
-		text("Bullets: " + (bulletQty - bulletIndex), width / 4, height/15);
+		//text("Bullets: " + (bulletQty - bulletIndex), width / 4, height/15);
 
 		//control player by dragging with mouse
 		if (isPlayerDragged) {
@@ -210,7 +223,6 @@ function draw() {
 		//move the enemy to the top of the screen, at a random x position
 		for (i = 0; i < enemyQty; i++) {
 			if (enemies[i].position.y > height) {
-				score++;
 				enemies[i].position.y = 0;
 				enemies[i].position.x = random(5, width-5);
 			}
@@ -227,14 +239,36 @@ function draw() {
 			}
 		}
 
+		//Every frame, refill has a very small chance of spawning
+		if(Math.random() < 0.01){
+			if(!bulletRefill.visible){
+				bulletRefill.visible = true;
+				bulletRefill.position.y = 0;
+				bulletRefill.position.x = random(5, width-5);
+			}
+		}
+		if(bulletRefill.visible){
+			bulletRefill.position.y = bulletRefill.position.y + posFactor;
+			if(bulletRefill.position.y > height){
+				bulletRefill.visible = false;
+				bulletRefill.position.x = width/2; 
+				bulletRefill.position.y = height;
+			}
+		}
+		else{
+			bulletRefill.position.x = width/2; 
+			bulletRefill.position.y = height;
+		}
+
+
 		//draws all the sprites on the screen
 		drawSprites();
 	}
 }
 
-function gameOver() {
-	if(Math.floor(score/10) > highScore){
-		highScore = Math.floor(score/10);
+function showStartScreen() {
+	if(score > highScore){
+		highScore = score;
 	}
 	background(0);
 	textAlign(CENTER);
@@ -267,8 +301,8 @@ function gameOver() {
 
 function restartGame(){
 	if (isGameOver){
-		if(Math.floor(score/10) > highScore){
-			highScore = Math.floor(score/10);
+		if(score > highScore){
+			highScore = score;
 		}
 		score = 0;
 		firstRun = true;
@@ -315,6 +349,14 @@ function shoot(){
 	}
 }
 
+//run shoot function every 0.15 of a second
+setInterval(shoot, 150);
+
+function refillBullets(){
+	bulletIndex = 0;
+	bulletQtyBar.width = width;
+}
+
 //runs when the mouse is clicked **and released** or the screen is tapped **and released**
 function mouseClicked() {
 	if(isGameOver){
@@ -326,11 +368,6 @@ function mouseClicked() {
 function keyPressed() {
 	if (isGameOver){
 		restartGame();
-	}
-	else{
-		if (keyCode === 32) {
-			shoot();
-		}
 	}
 }
 
