@@ -1,27 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Hello World!</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Vaccine Strikes Back</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
+    <!-- Google Fonts Roboto -->
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+    />
+    <!-- Material Design Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
   </head>
   <body>
-      <h1 class="title">Hello World! </h1>
-     
+    <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+      <div class="d-flex flex-column mb-3">
+        <div class="p-2">
+          <h1>The Vaccine Strikes Back</h1>
+        </div>
+        <div class="p-2" style="margin-top: 50px;">
+          <div class="form-outline">
+            <input type="email" id="typeEmail" class="form-control"/>
+            <label class="form-label" for="typeEmail">Email</label>
+          </div>
+        </div>
+        <div class="p-2">
+          <div class="form-outline">
+            <input type="password" id="typePassword" class="form-control" />
+            <label class="form-label" for="typePassword">Password</label>
+          </div>
+        </div>
+        <div class="p-2">
+          <div class="d-flex justify-content-between">
+            <a class="btn btn-link" href="" role="button">Create an account</a>
+            <button type="button" onclick="createAccount()" class="btn btn-primary">CREATE</button>
+            <button type="button" onclick="login()" class="btn btn-primary">LOGIN</button>
+            <button type="button" onclick="logout()" class="btn btn-primary">LOGOUT</button>
+        </div>
+      </div>
+    </div>
 
 
-      
-      <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
-      <script>
-          const firebaseConfig = {
-            apiKey: "AIzaSyAkmzjSu-WBERsAYar9ZMOH2lEZoI5Fqxk",
-            authDomain: "the-vaccine-strikes-back.firebaseapp.com",
-            projectId: "the-vaccine-strikes-back",
-            storageBucket: "the-vaccine-strikes-back.appspot.com",
-            messagingSenderId: "183695490033",
-            appId: "1:183695490033:web:ad797c162b61ddcbab6250",
-            measurementId: "G-9SZ54Y6EG7"
-        };
-        firebase.initializeApp(config);
-      </script>
-      <script src = "login.js"></script> 
+    <!-- Material Design Bootstrap JS -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script>
+    <!-- Custom script -->
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAkmzjSu-WBERsAYar9ZMOH2lEZoI5Fqxk",
+          authDomain: "the-vaccine-strikes-back.firebaseapp.com",
+          projectId: "the-vaccine-strikes-back",
+          storageBucket: "the-vaccine-strikes-back.appspot.com",
+          messagingSenderId: "183695490033",
+          appId: "1:183695490033:web:ad797c162b61ddcbab6250",
+          measurementId: "G-9SZ54Y6EG7"
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <script type="text/javascript" src="login.js"></script> 
   </body>
 </html>
