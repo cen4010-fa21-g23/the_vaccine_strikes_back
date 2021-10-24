@@ -1,3 +1,137 @@
+//** 	Login Code	 *//
+
+window.onload = loadLoginPage();
+
+var hasSignedIn = false;
+var authChecked = false;
+
+function validateTextBox() {
+     var val1 = document.getElementById("typeEmail").value;
+     var val2 = document.getElementById("typePassword").value;
+     var val3 = document.getElementById("typePasswordAgain").value;
+     
+     if(!val1.replace(/\s/g, '').length || !val2.replace(/\s/g, '').length){
+          console.log('One of the inputs is invalid.');
+          return false;
+     }
+     if(!validateEmail(val1)){
+          alert("Email must be a valid email address.");
+          return false;
+     }
+     if(val2.length < 8){
+          alert("Password must contain 8 characters or more.");
+          return false;
+     }
+     if(val2 != val3){
+          alert("Passwords do not match");
+          return false;
+     }
+     return true;
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+function loadCreateAcctPage(){
+     document.getElementById("login").style.display = "none";
+     document.getElementById("createAcct").style.display = "block";
+     document.getElementById("gameDiv").style.display = "none";
+}
+
+function loadLoginPage(){
+     document.getElementById("login").style.display = "block";
+     document.getElementById("createAcct").style.display = "none";
+     document.getElementById("gameDiv").style.display = "none";
+}
+
+function createAccount(){
+     if(validateTextBox()){
+          var email = document.getElementById("typeEmail").value;
+          var password = document.getElementById("typePassword").value;
+          firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+          // Signed in 
+          var user = userCredential.user;
+          // ...
+          })
+          .catch((error) => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ..
+          });
+     }
+}
+
+function login(){
+     var email = document.getElementById("email").value;
+     var password = document.getElementById("password").value;
+     firebase.auth().signInWithEmailAndPassword(email, password)
+     .then((userCredential) => {
+          // Signed in
+          var user = userCredential.user;
+          // ...
+     })
+     .catch((error) => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+		  alert(error.message);
+     });
+}
+
+function logout(){
+     firebase.auth().signOut().then(function() {
+       // Sign-out successful.
+     }).catch(function(error) {
+       // An error happened.
+     });
+	 loadLoginPage();
+}
+
+firebase.auth().onAuthStateChanged(function(user) {
+     authChecked = true;
+     if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          //alert('Hello ' + email + ', you are successfully signed in!');
+          hasSignedIn = true;
+          displayGame();
+          // ...
+     } else {
+          if(hasSignedIn == true && !alert('Signed out successfully!')){window.location.reload();}
+          // User is signed out.
+          // ...
+     }
+});
+
+function displayGame(){
+     document.getElementById("login").style.display = "none";
+     document.getElementById("createAcct").style.display = "none";
+     document.getElementById("gameDiv").style.display = "block";
+}
+
+document.getElementById('email').onkeydown = function(e){
+	if(e.key === 'Enter' || e.keyCode === 13){
+	  login();
+	}
+};
+
+document.getElementById('password').onkeydown = function(e){
+	if(e.key === 'Enter' || e.keyCode === 13){
+	  login();
+	}
+};
+
+//** 	Game Code	 *//
+
+//canvas
 var cnv;
 
 //player related variables
@@ -50,11 +184,13 @@ p5.disableFriendlyErrors = true; // disable FES for performance
 
 //This function runs once the first time the game is launched
 function setup() {
+	document.getElementById("logoutBtn").style.display = "block";
+
 	//scale sprites depending on whether game is running on mobile or pc
 	if(isMobile){
-		spriteScaleFactor = 2.5;
-		textScaleFactor = 4;
-		movLimScaleFactor = 2;
+		spriteScaleFactor = 1.2;
+		textScaleFactor = 1.2;
+		movLimScaleFactor = 1.2;
 	}
 	else{
 		spriteScaleFactor = 1;
@@ -64,7 +200,7 @@ function setup() {
 
 	if(isMobile){
 		//Disable pixel scaling (reduces quality) to improve performance on mobile
-		pixelDensity(1);
+		//pixelDensity(1);
 	}
 
 	frameRate(60);
@@ -86,6 +222,7 @@ function setup() {
 		cnv = createCanvas(500, windowHeight);
 	}
 
+	cnv.parent("gameDiv");
 	cnv.style('display', 'block');
 	centerCanvas();
 	player = createSprite(width/2, height-(height/8), playerWidth, playerHeight);
@@ -123,6 +260,9 @@ function setup() {
 //This function runs every frame
 function draw() {
 	//console.log(score);
+	if(keyDown(76)){
+		logout();
+	}
 
 	if(firstRun){
 		for (i = 0; i < enemyQty; i++) {
@@ -294,6 +434,7 @@ function showStartScreen() {
 	if(highScore != 0){
 		text("Your highest score is: " + highScore, width / 2, height / 1.7);
 	}
+
 	textAlign(RIGHT);
 	textSize(16*textScaleFactor/1.5);
 	text(buildType + " " + buildVer, width-16, height-16);
@@ -323,6 +464,8 @@ function restartGame(){
 			bullets[i].position.y = height;
 			bullets[i].visible = false;
 		}
+
+
 	}
 }
 

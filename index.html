@@ -1,12 +1,115 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Vaccine Strikes Back</title>
-  <meta name="viewport" content="user-scalable=0"> 
-</head>
-<body>
-  <script src="https://cdn.jsdelivr.net/npm/p5"></script>
-  <script src="https://cdn.jsdelivr.net/gh/molleindustria/p5.play/lib/p5.play.js"></script>
-  <script src="main.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Vaccine Strikes Back</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
+    <!-- Google Fonts Roboto -->
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+    />
+    <!-- Material Design Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
+  </head>
+  <body class="bg-dark text-white">
+    <div id="gameDiv" style="display: none;"></div>
+    <div id="login" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2">
+            <h1>The Vaccine Strikes Back</h1>
+          </div>
+          <div class="p-2" style="margin-top: 50px;">
+            <h2>Log in</h2>
+          </div>
+          <div class="p-2" style="margin-top: 10px;">
+            <div class="form-outline form-white">
+              <input type="email" id="email" class="form-control"/>
+              <label class="form-label" for="email">Email</label>
+            </div>
+          </div>
+          <div class="p-2">
+            <div class="form-outline form-white">
+              <input type="password" id="password" class="form-control" />
+              <label class="form-label" for="password">Password</label>
+            </div>
+          </div>
+          <div class="p-2"  style="margin-top: 10px;">
+            <div class="d-flex justify-content-between">
+              <button type="button" onclick="loadCreateAcctPage()" class="btn btn-link" data-mdb-ripple-color="light">Create an account</button>
+              <button type="button" onclick="login()" class="btn btn-primary">LOGIN</button>
+              <button type="button" onclick="logout()" class="btn btn-primary" id="logoutBtn" hidden="true">LOGOUT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="createAcct" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2">
+            <h1>The Vaccine Strikes Back</h1>
+          </div>
+          <div class="p-2 d-flex justify-content-around" style="margin-top: 50px;">
+            <a class="text-white" style="margin-right: 10px; font-size: x-large;" href="javascript:loadLoginPage()" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2>Create an account</h2>
+            <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="javascript:loadLoginPage()" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+          </div>
+          <div class="p-2" style="margin-top: 10px;">
+            <div class="form-outline form-white">
+              <input type="email" id="typeEmail" class="form-control"/>
+              <label class="form-label" for="typeEmail">Email</label>
+            </div>
+          </div>
+          <div class="p-2">
+            <div class="form-outline form-white">
+              <input type="password" id="typePassword" class="form-control" />
+              <label class="form-label" for="typePassword">Password</label>
+            </div>
+          </div>
+          <div class="p-2">
+            <div class="form-outline form-white">
+              <input type="password" id="typePasswordAgain" class="form-control" />
+              <label class="form-label" for="typePasswordAgain">Re-enter password</label>
+            </div>
+          </div>
+          <div class="p-2" style="margin-top: 10px;">
+            <div class="d-flex justify-content-end">
+              <button type="button" onclick="createAccount()" class="btn btn-primary">SUBMIT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Material Design Bootstrap JS -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script>
+    <!-- Custom script -->
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAkmzjSu-WBERsAYar9ZMOH2lEZoI5Fqxk",
+          authDomain: "the-vaccine-strikes-back.firebaseapp.com",
+          projectId: "the-vaccine-strikes-back",
+          storageBucket: "the-vaccine-strikes-back.appspot.com",
+          messagingSenderId: "183695490033",
+          appId: "1:183695490033:web:ad797c162b61ddcbab6250",
+          measurementId: "G-9SZ54Y6EG7"
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/molleindustria/p5.play/lib/p5.play.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+  </body>
 </html>
