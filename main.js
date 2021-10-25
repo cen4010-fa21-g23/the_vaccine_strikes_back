@@ -2,31 +2,39 @@
 
 window.onload = loadLoginPage();
 
+var database = firebase.database();
+
+//username variable
+var uname;
+
 var hasSignedIn = false;
 var authChecked = false;
 
+var visiblePage;
+
 function validateTextBox() {
-     var val1 = document.getElementById("typeEmail").value;
-     var val2 = document.getElementById("typePassword").value;
-     var val3 = document.getElementById("typePasswordAgain").value;
-     
-     if(!val1.replace(/\s/g, '').length || !val2.replace(/\s/g, '').length){
-          console.log('One of the inputs is invalid.');
-          return false;
-     }
-     if(!validateEmail(val1)){
-          alert("Email must be a valid email address.");
-          return false;
-     }
-     if(val2.length < 8){
-          alert("Password must contain 8 characters or more.");
-          return false;
-     }
-     if(val2 != val3){
-          alert("Passwords do not match");
-          return false;
-     }
-     return true;
+	var val1 = document.getElementById("typeEmail").value;
+	var val2 = document.getElementById("typeUsername").value;
+	var val3 = document.getElementById("typePassword").value;
+	var val4 = document.getElementById("typePasswordAgain").value;
+	
+	if(!val1.replace(/\s/g, '').length || !val2.replace(/\s/g, '').length || !val3.replace(/\s/g, '').length|| !val4.replace(/\s/g, '').length){
+	alert('One of the inputs is invalid.');
+		return false;
+	}
+	if(!validateEmail(val1)){
+		alert("Email must be a valid email address.");
+		return false;
+	}
+	if(val3.length < 8){
+		alert("Password must contain 8 characters or more.");
+		return false;
+	}
+	if(val3 != val4){
+		alert("Passwords do not match");
+		return false;
+	}
+	return true;
 }
 
 function validateEmail(email) {
@@ -34,34 +42,61 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
+function loadLoadingPage(){
+	visiblePage = "loading";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	//document.getElementById("loadingDiv").style.display = "block";
+}
+
 function loadCreateAcctPage(){
-     document.getElementById("login").style.display = "none";
-     document.getElementById("createAcct").style.display = "block";
-     document.getElementById("gameDiv").style.display = "none";
+	visiblePage = "createAcct";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "block";
+	document.getElementById("gameDiv").style.display = "none";
+	//document.getElementById("loadingDiv").style.display = "none";
 }
 
 function loadLoginPage(){
-     document.getElementById("login").style.display = "block";
-     document.getElementById("createAcct").style.display = "none";
-     document.getElementById("gameDiv").style.display = "none";
+	visiblePage = "login";
+	document.getElementById("login").style.display = "block";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	//document.getElementById("loadingDiv").style.display = "none";
+}
+
+function loadGamePage(){
+	visiblePage = "game";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "block";
+	//document.getElementById("loadingDiv").style.display = "none";
 }
 
 function createAccount(){
-     if(validateTextBox()){
-          var email = document.getElementById("typeEmail").value;
-          var password = document.getElementById("typePassword").value;
-          firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-          // Signed in 
-          var user = userCredential.user;
-          // ...
-          })
-          .catch((error) => {
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ..
-          });
-     }
+	if(validateTextBox()){
+		var email = document.getElementById("typeEmail").value;
+		var password = document.getElementById("typePassword").value;
+		var username = document.getElementById("typeUsername").value;
+
+		firebase.auth().createUserWithEmailAndPassword(email, password)
+		.then((userCredential) => {
+		// Signed in 
+		var user = userCredential.user;
+
+		uname = username;
+		var highScore = 0;
+		writeUserHighScore(0);
+		writeUsername(username);
+		})
+		.catch((error) => {
+		var errorCode = error.code;
+		var errorMessage = error.message;
+		alert(error.message);
+		// ..
+		});
+	}
 }
 
 function login(){
@@ -102,7 +137,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           var providerData = user.providerData;
           //alert('Hello ' + email + ', you are successfully signed in!');
           hasSignedIn = true;
-          displayGame();
+          loadGamePage();
           // ...
      } else {
           if(hasSignedIn == true && !alert('Signed out successfully!')){window.location.reload();}
@@ -110,24 +145,6 @@ firebase.auth().onAuthStateChanged(function(user) {
           // ...
      }
 });
-
-function displayGame(){
-     document.getElementById("login").style.display = "none";
-     document.getElementById("createAcct").style.display = "none";
-     document.getElementById("gameDiv").style.display = "block";
-}
-
-document.getElementById('email').onkeydown = function(e){
-	if(e.key === 'Enter' || e.keyCode === 13){
-	  login();
-	}
-};
-
-document.getElementById('password').onkeydown = function(e){
-	if(e.key === 'Enter' || e.keyCode === 13){
-	  login();
-	}
-};
 
 //** 	Game Code	 *//
 
@@ -184,13 +201,14 @@ p5.disableFriendlyErrors = true; // disable FES for performance
 
 //This function runs once the first time the game is launched
 function setup() {
-	document.getElementById("logoutBtn").style.display = "block";
+	//This function runs before the game starts, therefore set a flag that is set to true when this function runs
+	freshPage = true;
 
 	//scale sprites depending on whether game is running on mobile or pc
 	if(isMobile){
-		spriteScaleFactor = 1.2;
-		textScaleFactor = 1.2;
-		movLimScaleFactor = 1.2;
+		spriteScaleFactor = 1.1;
+		textScaleFactor = 1.1;
+		movLimScaleFactor = 1.1;
 	}
 	else{
 		spriteScaleFactor = 1;
@@ -259,8 +277,14 @@ function setup() {
 
 //This function runs every frame
 function draw() {
+	//console.log(getHighScore());
+	if(freshPage){
+		freshPage = false;
+		//show blank page if info is still not loaded
+	}
+
 	//console.log(score);
-	if(keyDown(76)){
+	if(keyDown(76) && visiblePage == "game"){
 		logout();
 	}
 
@@ -329,10 +353,8 @@ function draw() {
 				newY = playerSize/2;
 			}
 
-
 			player.position.x = newX;
 			player.position.y = newY;
-			
 		}
 
 		//control player with arrows or WSAD
@@ -400,19 +422,32 @@ function draw() {
 			bulletRefill.position.y = height;
 		}
 
-
 		//draws all the sprites on the screen
 		drawSprites();
 	}
 }
 
 function showStartScreen() {
-	if(score > highScore){
-		highScore = score;
+	//read user high score from firebase
+	var user = firebase.auth().currentUser;
+	if(user){
+		getHighScore();
+		
+		if(score > highScore){
+			highScore = score;
+			writeUserHighScore(highScore);
+		}
+
+		getUsername();
 	}
+
 	background(0);
 	textAlign(CENTER);
 	fill("white");
+	textSize(16*textScaleFactor);
+	if(user && uname){
+		text("Hello " + uname + "!", width / 2, height / 8);
+	}
 	textSize(32*textScaleFactor);
 	if(isMobile){
 		text("The Vaccine", width / 2, height / 3.5);
@@ -431,7 +466,7 @@ function showStartScreen() {
 	}
 	//text("PixelDensity is " + pixelDensity(), width / 2, height / 1.3);
 	//text("isMobile is " + isMobile, width / 2, height / 1.1);
-	if(highScore != 0){
+	if(user && highScore != 0 && highScore != null){
 		text("Your highest score is: " + highScore, width / 2, height / 1.7);
 	}
 
@@ -440,10 +475,58 @@ function showStartScreen() {
 	text(buildType + " " + buildVer, width-16, height-16);
 }
 
+function writeUserHighScore(newHighScore) {
+	if(hasSignedIn){
+		var user = firebase.auth().currentUser;
+		if(!uname){
+			getUsername();
+		}
+		highScore = newHighScore;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore
+		});
+	}
+}
+
+function writeUsername(newUsername) {
+	if(hasSignedIn){
+		var user = firebase.auth().currentUser;
+		if(!highScore){
+			getHighScore();
+		}
+		uname = newUsername;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore
+		});
+	}
+}
+
+function getUsername(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			uname = (snapshot.val() && snapshot.val().username) || 'Player';
+		});
+	}
+}
+
+function getHighScore(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			highScore = (snapshot.val() && snapshot.val().highScore);
+		});
+	}
+}
+
 function restartGame(){
 	if (isGameOver){
 		if(score > highScore){
-			highScore = score;
+			writeUserHighScore(score);
 		}
 		score = 0;
 		firstRun = true;

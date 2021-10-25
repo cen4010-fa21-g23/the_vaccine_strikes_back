@@ -16,6 +16,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
   </head>
   <body class="bg-dark text-white">
+    <!-- <div id="loadingDiv" style="display: none;" class="d-flex align-items-center justify-content-center">
+      <div class="spinner-border text-light" style="width: 3rem; height: 3rem; margin-top: 50vh; margin-bottom: 40vh;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>-->
     <div id="gameDiv" style="display: none;"></div>
     <div id="login" style="display: none;">
       <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
@@ -69,6 +74,12 @@
               <label class="form-label" for="typeEmail">Email</label>
             </div>
           </div>
+          <div class="p-2" style="margin-top: 10px;">
+            <div class="form-outline form-white">
+              <input type="username" id="typeUsername" class="form-control"/>
+              <label class="form-label" for="typeUsername">Username</label>
+            </div>
+          </div>
           <div class="p-2">
             <div class="form-outline form-white">
               <input type="password" id="typePassword" class="form-control" />
@@ -104,7 +115,8 @@
           storageBucket: "the-vaccine-strikes-back.appspot.com",
           messagingSenderId: "183695490033",
           appId: "1:183695490033:web:ad797c162b61ddcbab6250",
-          measurementId: "G-9SZ54Y6EG7"
+          measurementId: "G-9SZ54Y6EG7",
+          databaseURL: "https://the-vaccine-strikes-back-default-rtdb.firebaseio.com",
       };
       firebase.initializeApp(firebaseConfig);
     </script>
