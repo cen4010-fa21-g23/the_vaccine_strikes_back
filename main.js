@@ -42,11 +42,13 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
+//unused for now
 function loadLoadingPage(){
 	visiblePage = "loading";
 	document.getElementById("login").style.display = "none";
 	document.getElementById("createAcct").style.display = "none";
 	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "block";
 }
 
@@ -55,7 +57,9 @@ function loadCreateAcctPage(){
 	document.getElementById("login").style.display = "none";
 	document.getElementById("createAcct").style.display = "block";
 	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
 }
 
 function loadLoginPage(){
@@ -63,7 +67,9 @@ function loadLoginPage(){
 	document.getElementById("login").style.display = "block";
 	document.getElementById("createAcct").style.display = "none";
 	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
 }
 
 function loadGamePage(){
@@ -71,7 +77,40 @@ function loadGamePage(){
 	document.getElementById("login").style.display = "none";
 	document.getElementById("createAcct").style.display = "none";
 	document.getElementById("gameDiv").style.display = "block";
+	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
+}
+
+function loadMainMenu(){
+	visiblePage = "mainMenu";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "block";
+	document.getElementById("leaderboard").style.display = "none";
+
+	var user = firebase.auth().currentUser;
+	if(user){
+		getHighScore();
+		
+		if(score > highScore){
+			highScore = score;
+			writeUserHighScore(highScore);
+		}
+
+		getUsername();
+	}
+}
+
+function loadLeaderboard(){
+	visiblePage = "leaderboard";
+	//getLeaderboard();
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
+	document.getElementById("leaderboard").style.display = "block";
 }
 
 function createAccount(){
@@ -137,7 +176,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           var providerData = user.providerData;
           //alert('Hello ' + email + ', you are successfully signed in!');
           hasSignedIn = true;
-          loadGamePage();
+          loadMainMenu();
           // ...
      } else {
           if(hasSignedIn == true && !alert('Signed out successfully!')){window.location.reload();}
@@ -145,6 +184,119 @@ firebase.auth().onAuthStateChanged(function(user) {
           // ...
      }
 });
+
+
+function writeUserHighScore(newHighScore) {
+	if(hasSignedIn && newHighScore){
+		var user = firebase.auth().currentUser;
+		if(!uname){
+			getUsername();
+		}
+		highScore = newHighScore;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore
+		});
+	}
+}
+
+function writeUsername(newUsername) {
+	if(hasSignedIn && newUsername){
+		var user = firebase.auth().currentUser;
+		if(!highScore){
+			getHighScore();
+		}
+		uname = newUsername;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore
+		});
+	}
+}
+
+function getUsername(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			uname = (snapshot.val() && snapshot.val().username);
+			document.getElementById("usernameDisplay").innerHTML = "Hello " + uname + "!";
+		});
+	}
+}
+
+function getHighScore(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			highScore = (snapshot.val() && snapshot.val().highScore);
+			document.getElementById("highScore").innerHTML = "Highscore: " + highScore;
+		});
+	}
+}
+
+let leaderboardBody = document.getElementById("leaderboardBody");
+leaderboardBody.innerHTML = "";
+let db = firebase.database().ref();
+let usersRef = db.child("users");
+
+usersRef.once("value").then(function(snapshot) {
+	snapshot.forEach(function(userSnapshot) {
+		trbase = document.createElement("tr");
+		trbase.classList.add('table-dark');
+
+		trbaseUsername = document.createElement("th");
+		trbaseUsername.setAttribute('scope', 'row');
+		trbaseUsername.innerHTML = userSnapshot.child("username").val();
+
+		trbasehighScore = document.createElement("td");
+		trbasehighScore.innerHTML = userSnapshot.child("highScore").val();
+
+		trbase.appendChild(trbaseUsername);
+		trbase.appendChild(trbasehighScore);
+
+		leaderboardBody.appendChild(trbase);
+
+		sortTable();
+	});
+});
+
+function sortTable() {
+	var table, rows, switching, i, x, y, shouldSwitch;
+	table = document.getElementById("leaderboardTable");
+	switching = true;
+	/*Make a loop that will continue until
+	no switching has been done:*/
+	while (switching) {
+	  //start by saying: no switching is done:
+	  switching = false;
+	  rows = table.rows;
+	  /*Loop through all table rows (except the
+	  first, which contains table headers):*/
+	  for (i = 1; i < (rows.length - 1); i++) {
+		//start by saying there should be no switching:
+		shouldSwitch = false;
+		/*Get the two elements you want to compare,
+		one from current row and one from the next:*/
+		x = rows[i].getElementsByTagName("TD")[0];
+		y = rows[i + 1].getElementsByTagName("TD")[0];
+		//check if the two rows should switch place:
+		if (Number(x.innerHTML) < Number(y.innerHTML)) {
+		  //if so, mark as a switch and break the loop:
+		  shouldSwitch = true;
+		  break;
+		}
+	  }
+	  if (shouldSwitch) {
+		/*If a switch has been marked, make the switch
+		and mark that a switch has been done:*/
+		rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+		switching = true;
+	  }
+	}
+  }
+
 
 //** 	Game Code	 *//
 
@@ -284,9 +436,9 @@ function draw() {
 	}
 
 	//console.log(score);
-	if(keyDown(76) && visiblePage == "game"){
-		logout();
-	}
+	//if(keyDown(76) && visiblePage == "game"){
+	//	logout();
+	//}
 
 	if(firstRun){
 		for (i = 0; i < enemyQty; i++) {
@@ -297,13 +449,15 @@ function draw() {
 	}
 
 	if (isGameOver) {
-        showStartScreen();
+        //showStartScreen();
+		loadMainMenu();
     } 
     else {
 		for (i = 0; i < enemyQty; i++) {
 			if(enemies[i].overlap(player)){
 				isGameOver = true;
-				showStartScreen();
+				//showStartScreen();
+				loadMainMenu();
 			}
 		}
 		for(i = 0; i < bulletQty; i++){
@@ -445,6 +599,7 @@ function showStartScreen() {
 	textAlign(CENTER);
 	fill("white");
 	textSize(16*textScaleFactor);
+
 	if(user && uname){
 		text("Hello " + uname + "!", width / 2, height / 8);
 	}
@@ -473,54 +628,6 @@ function showStartScreen() {
 	textAlign(RIGHT);
 	textSize(16*textScaleFactor/1.5);
 	text(buildType + " " + buildVer, width-16, height-16);
-}
-
-function writeUserHighScore(newHighScore) {
-	if(hasSignedIn){
-		var user = firebase.auth().currentUser;
-		if(!uname){
-			getUsername();
-		}
-		highScore = newHighScore;
-		var userId = firebase.auth().currentUser.uid;
-		firebase.database().ref('users/'+userId).set({
-			username: uname,
-			highScore: highScore
-		});
-	}
-}
-
-function writeUsername(newUsername) {
-	if(hasSignedIn){
-		var user = firebase.auth().currentUser;
-		if(!highScore){
-			getHighScore();
-		}
-		uname = newUsername;
-		var userId = firebase.auth().currentUser.uid;
-		firebase.database().ref('users/'+userId).set({
-			username: uname,
-			highScore: highScore
-		});
-	}
-}
-
-function getUsername(){
-	if(hasSignedIn){
-		var userId = firebase.auth().currentUser.uid;
-		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
-			uname = (snapshot.val() && snapshot.val().username) || 'Player';
-		});
-	}
-}
-
-function getHighScore(){
-	if(hasSignedIn){
-		var userId = firebase.auth().currentUser.uid;
-		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
-			highScore = (snapshot.val() && snapshot.val().highScore);
-		});
-	}
 }
 
 function restartGame(){

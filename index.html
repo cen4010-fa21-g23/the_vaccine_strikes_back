@@ -45,9 +45,9 @@
           </div>
           <div class="p-2"  style="margin-top: 10px;">
             <div class="d-flex justify-content-between">
-              <button type="button" onclick="loadCreateAcctPage()" class="btn btn-link" data-mdb-ripple-color="light">Create an account</button>
-              <button type="button" onclick="login()" class="btn btn-primary">LOGIN</button>
-              <button type="button" onclick="logout()" class="btn btn-primary" id="logoutBtn" hidden="true">LOGOUT</button>
+              <button type="button" onclick="loadCreateAcctPage()" class="btn btn-link btn-rounded" data-mdb-ripple-color="light">Create an account</button>
+              <button type="button" onclick="login()" class="btn btn-primary btn-rounded">LOGIN</button>
+              <button type="button" onclick="logout()" class="btn btn-primary btn-rounded" id="logoutBtn" hidden="true">LOGOUT</button>
             </div>
           </div>
         </div>
@@ -94,14 +94,62 @@
           </div>
           <div class="p-2" style="margin-top: 10px;">
             <div class="d-flex justify-content-end">
-              <button type="button" onclick="createAccount()" class="btn btn-primary">SUBMIT</button>
+              <button type="button" onclick="createAccount()" class="btn btn-primary btn-rounded">SUBMIT</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
+    <div id="mainMenu" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2">
+            <div class="d-flex justify-content-between" style="margin-bottom: 50px;">
+              <button type="button" onclick="logout()" class="btn btn-primary btn-rounded"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout</button>
+              <button type="button" class="btn btn-primary btn-rounded"><i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;Settings</button>
+            </div>
+            <div class="p-2" style="margin-bottom: 30px;">
+              <h4 id="usernameDisplay">&nbsp;</h4>
+            </div>
+            <h1>The Vaccine Strikes Back</h1>
+          </div>
+          <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
+            <button type="button" class="btn btn-lg btn-primary btn-rounded" style="margin-right: 50px;"><i class="fas fa-shopping-bag"></i>&nbsp;&nbsp;&nbsp;Store</button>
+            <button type="button" onclick="loadGamePage()" class="btn btn-lg btn-primary btn-rounded"><i class="fas fa-play"></i>&nbsp;&nbsp;&nbsp;Play</button>
+          </div>
+          <div class="p-2" style="margin-top: 25px">
+            <h3 id="playerCash">$0</h3>
+          </div>
+          <div class="p-2" style="margin-bottom: 25px;">
+            <h3 id="highScore">&nbsp;</h3>
+          </div>
+          <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
+            <button type="button" onclick="loadLeaderboard()" class="btn btn-primary btn-rounded">Leaderboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="leaderboard" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2">
+            <h1>Leaderboard</h1>
+          </div>
+          <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
+            <table class="table" id="leaderboardTable">
+              <thead id="leaderboardHead">
+                <tr class="table-light">
+                  <th scope="col">Username</th>
+                  <th scope="col">Score</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Material Design Bootstrap JS -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script>
