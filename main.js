@@ -50,6 +50,8 @@ function loadLoadingPage(){
 	document.getElementById("gameDiv").style.display = "none";
 	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "block";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
 }
 
 function loadCreateAcctPage(){
@@ -60,6 +62,8 @@ function loadCreateAcctPage(){
 	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
 	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
 }
 
 function loadLoginPage(){
@@ -70,6 +74,8 @@ function loadLoginPage(){
 	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
 	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
 }
 
 function loadGamePage(){
@@ -80,6 +86,9 @@ function loadGamePage(){
 	document.getElementById("mainMenu").style.display = "none";
 	//document.getElementById("loadingDiv").style.display = "none";
 	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
+	restartGame();
 }
 
 function loadMainMenu(){
@@ -89,6 +98,8 @@ function loadMainMenu(){
 	document.getElementById("gameDiv").style.display = "none";
 	document.getElementById("mainMenu").style.display = "block";
 	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
 
 	var user = firebase.auth().currentUser;
 	if(user){
@@ -105,12 +116,37 @@ function loadMainMenu(){
 
 function loadLeaderboard(){
 	visiblePage = "leaderboard";
-	//getLeaderboard();
 	document.getElementById("login").style.display = "none";
 	document.getElementById("createAcct").style.display = "none";
 	document.getElementById("gameDiv").style.display = "none";
 	document.getElementById("mainMenu").style.display = "none";
 	document.getElementById("leaderboard").style.display = "block";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
+}
+
+function loadSettingsPage(){
+	visiblePage = "settings";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "block";
+	document.getElementById("changeUsername").style.display = "none";
+
+	document.getElementById("changeUserDisplay").innerHTML = "Current username: " + uname;
+}
+
+function loadChangeUsernamePage(){
+	visiblePage = "changeUsername";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "block";
 }
 
 function createAccount(){
@@ -182,6 +218,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           if(hasSignedIn == true && !alert('Signed out successfully!')){window.location.reload();}
           // User is signed out.
           // ...
+		  loadLoginPage();
      }
 });
 
@@ -214,6 +251,11 @@ function writeUsername(newUsername) {
 			highScore: highScore
 		});
 	}
+}
+
+function updateUsername(){
+	writeUsername(document.getElementById("typeUsernameChange").value);
+	location.reload();
 }
 
 function getUsername(){
@@ -358,9 +400,9 @@ function setup() {
 
 	//scale sprites depending on whether game is running on mobile or pc
 	if(isMobile){
-		spriteScaleFactor = 1.1;
-		textScaleFactor = 1.1;
-		movLimScaleFactor = 1.1;
+		spriteScaleFactor = 1;
+		textScaleFactor = 1;
+		movLimScaleFactor = 1;
 	}
 	else{
 		spriteScaleFactor = 1;
@@ -429,16 +471,13 @@ function setup() {
 
 //This function runs every frame
 function draw() {
-	//console.log(getHighScore());
-	if(freshPage){
-		freshPage = false;
-		//show blank page if info is still not loaded
+	if(uname){
+		document.getElementById("playBtn").disabled = false;
+		document.getElementById("settingsBtn").disabled = false;
 	}
+	//console.log(getHighScore());
 
 	//console.log(score);
-	//if(keyDown(76) && visiblePage == "game"){
-	//	logout();
-	//}
 
 	if(firstRun){
 		for (i = 0; i < enemyQty; i++) {
@@ -448,15 +487,28 @@ function draw() {
 		firstRun = false;
 	}
 
-	if (isGameOver) {
-        //showStartScreen();
+	if (isGameOver && visiblePage == "mainMenu") {
 		loadMainMenu();
-    } 
+    }
+	else if(isGameOver && visiblePage == "leaderboard"){
+		loadLeaderboard();
+	}
+	else if (isGameOver && visiblePage == "settings") {
+		loadSettingsPage();
+    }
+	else if (isGameOver && visiblePage == "changeUsername") {
+		loadChangeUsernamePage();
+    }
+	else if (isGameOver && visiblePage == "createAcct") {
+		loadCreateAcctPage();
+    }
+	else if(isGameOver && visiblePage == "login"){
+		loadLoginPage();
+	}
     else {
 		for (i = 0; i < enemyQty; i++) {
 			if(enemies[i].overlap(player)){
 				isGameOver = true;
-				//showStartScreen();
 				loadMainMenu();
 			}
 		}
@@ -692,16 +744,16 @@ function refillBullets(){
 
 //runs when the mouse is clicked **and released** or the screen is tapped **and released**
 function mouseClicked() {
-	if(isGameOver){
-		restartGame();
-	}
+	//if(isGameOver){
+	//	restartGame();
+	//}
 }
 
 //runs when any key is pressed
 function keyPressed() {
-	if (isGameOver){
-		restartGame();
-	}
+	//if (isGameOver){
+	//	restartGame();
+	//}
 }
 
 //runs when the mouse is clicked or screen is tapped

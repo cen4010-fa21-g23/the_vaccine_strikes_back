@@ -60,9 +60,7 @@
             <h1>The Vaccine Strikes Back</h1>
           </div>
           <div class="p-2 d-flex justify-content-around" style="margin-top: 50px;">
-            <a class="text-white" style="margin-right: 10px; font-size: x-large;" href="javascript:loadLoginPage()" role="button">
-              <i class="fas fa-arrow-left"></i>
-            </a>
+            <button type="button" onclick="loadMainMenu()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
             <h2>Create an account</h2>
             <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="javascript:loadLoginPage()" role="button">
               <i class="fas fa-arrow-left"></i>
@@ -76,7 +74,7 @@
           </div>
           <div class="p-2" style="margin-top: 10px;">
             <div class="form-outline form-white">
-              <input type="username" id="typeUsername" class="form-control"/>
+              <input type="text" id="typeUsername" class="form-control"/>
               <label class="form-label" for="typeUsername">Username</label>
             </div>
           </div>
@@ -105,8 +103,8 @@
         <div class="d-flex text-center flex-column mb-3">
           <div class="p-2">
             <div class="d-flex justify-content-between" style="margin-bottom: 50px;">
-              <button type="button" onclick="logout()" class="btn btn-primary btn-rounded"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout</button>
-              <button type="button" class="btn btn-primary btn-rounded"><i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;Settings</button>
+              <button type="button" id="logoutBtn" onclick="logout()" class="btn btn-primary btn-rounded"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout</button>
+              <button type="button" id="settingsBtn" onclick="loadSettingsPage()" class="btn btn-primary btn-rounded"><i class="fas fa-cog" disabled></i>&nbsp;&nbsp;&nbsp;Settings</button>
             </div>
             <div class="p-2" style="margin-bottom: 30px;">
               <h4 id="usernameDisplay">&nbsp;</h4>
@@ -114,8 +112,8 @@
             <h1>The Vaccine Strikes Back</h1>
           </div>
           <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
-            <button type="button" class="btn btn-lg btn-primary btn-rounded" style="margin-right: 50px;"><i class="fas fa-shopping-bag"></i>&nbsp;&nbsp;&nbsp;Store</button>
-            <button type="button" onclick="loadGamePage()" class="btn btn-lg btn-primary btn-rounded"><i class="fas fa-play"></i>&nbsp;&nbsp;&nbsp;Play</button>
+            <button type="button" id="storeBtn" class="btn btn-lg btn-primary btn-rounded" style="margin-right: 50px;" disabled><i class="fas fa-shopping-bag"></i>&nbsp;&nbsp;&nbsp;Store</button>
+            <button type="button" id="playBtn" onclick="loadGamePage()" class="btn btn-lg btn-primary btn-rounded" disabled><i class="fas fa-play"></i>&nbsp;&nbsp;&nbsp;Play</button>
           </div>
           <div class="p-2" style="margin-top: 25px">
             <h3 id="playerCash">$0</h3>
@@ -132,8 +130,12 @@
     <div id="leaderboard" style="display: none;">
       <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
         <div class="d-flex text-center flex-column mb-3">
-          <div class="p-2">
-            <h1>Leaderboard</h1>
+          <div class="p-2 d-flex justify-content-around">
+            <button type="button" onclick="loadMainMenu()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
+            <h2>Leaderboard</h2>
+            <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="javascript:loadMainMenu()" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
           </div>
           <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
             <table class="table" id="leaderboardTable">
@@ -146,6 +148,47 @@
               <tbody id="leaderboardBody">
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="settings" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2 d-flex justify-content-around">
+            <button type="button" onclick="loadMainMenu()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
+            <h2>Settings</h2>
+            <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+          </div>
+          <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
+            <h4 id="changeUserDisplay" style="margin-top: 100px; margin-bottom: 50px">Current username: </h4>
+            <button type="button" onclick="loadChangeUsernamePage()" class="btn btn-primary btn-rounded">Change Username</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="changeUsername" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2 d-flex justify-content-around">
+            <button type="button" onclick="loadSettingsPage()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
+            <h2>Change Username</h2>
+            <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+          </div>
+          <div class="p-2" style="margin-top: 100px">
+            <div class="form-outline form-white">
+              <input type="text" id="typeUsernameChange" class="form-control" />
+              <label class="form-label" for="typeUsernameChange">New username</label>
+            </div>
+          </div>
+          <div class="p-2" style="margin-top: 10px;">
+            <div class="d-flex justify-content-end">
+              <button type="button" onclick="updateUsername()" class="btn btn-primary btn-rounded">SUBMIT</button>
+            </div>
           </div>
         </div>
       </div>
