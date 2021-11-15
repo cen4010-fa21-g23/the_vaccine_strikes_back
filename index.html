@@ -15,7 +15,14 @@
     <!-- Material Design Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
   </head>
-  <body class="bg-dark text-white">
+  <body class="bg-dark text-white" style="
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none; 
+    ">
     <!-- <div id="loadingDiv" style="display: none;" class="d-flex align-items-center justify-content-center">
       <div class="spinner-border text-light" style="width: 3rem; height: 3rem; margin-top: 50vh; margin-bottom: 40vh;" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -60,7 +67,7 @@
             <h1>The Vaccine Strikes Back</h1>
           </div>
           <div class="p-2 d-flex justify-content-around" style="margin-top: 50px;">
-            <button type="button" onclick="loadMainMenu()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
+            <button type="button" onclick="loadLoginPage()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
             <h2>Create an account</h2>
             <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="javascript:loadLoginPage()" role="button">
               <i class="fas fa-arrow-left"></i>

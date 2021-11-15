@@ -6,6 +6,8 @@ var database = firebase.database();
 
 //username variable
 var uname;
+//highscore variable
+var highScore
 
 var hasSignedIn = false;
 var authChecked = false;
@@ -26,6 +28,10 @@ function validateTextBox() {
 		alert("Email must be a valid email address.");
 		return false;
 	}
+	if(!validateUsername(val2)){
+		alert("Invalid username.");
+		return false;
+	}
 	if(val3.length < 8){
 		alert("Password must contain 8 characters or more.");
 		return false;
@@ -35,6 +41,10 @@ function validateTextBox() {
 		return false;
 	}
 	return true;
+}
+
+function validateUsername(username) {
+    return /^[0-9a-zA-Z_.-]+$/.test(username);
 }
 
 function validateEmail(email) {
@@ -161,7 +171,7 @@ function createAccount(){
 		var user = userCredential.user;
 
 		uname = username;
-		var highScore = 0;
+		highScore = 0;
 		writeUserHighScore(0);
 		writeUsername(username);
 		})
@@ -224,7 +234,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 
 function writeUserHighScore(newHighScore) {
-	if(hasSignedIn && newHighScore){
+	if(newHighScore){
 		var user = firebase.auth().currentUser;
 		if(!uname){
 			getUsername();
@@ -239,7 +249,7 @@ function writeUserHighScore(newHighScore) {
 }
 
 function writeUsername(newUsername) {
-	if(hasSignedIn && newUsername){
+	if(newUsername){
 		var user = firebase.auth().currentUser;
 		if(!highScore){
 			getHighScore();
@@ -254,8 +264,14 @@ function writeUsername(newUsername) {
 }
 
 function updateUsername(){
-	writeUsername(document.getElementById("typeUsernameChange").value);
-	location.reload();
+	usrName = document.getElementById("typeUsernameChange").value;
+	if(validateUsername(usrName)){
+		writeUsername(usrName);
+		location.reload();
+	}
+	else{
+		alert("Invalid username.");
+	}
 }
 
 function getUsername(){
@@ -395,9 +411,6 @@ p5.disableFriendlyErrors = true; // disable FES for performance
 
 //This function runs once the first time the game is launched
 function setup() {
-	//This function runs before the game starts, therefore set a flag that is set to true when this function runs
-	freshPage = true;
-
 	//scale sprites depending on whether game is running on mobile or pc
 	if(isMobile){
 		spriteScaleFactor = 1;
@@ -467,7 +480,6 @@ function setup() {
 	bulletQtyBar = createSprite(width/2, height, width, 25*spriteScaleFactor);
 	bulletQtyBar.shapeColor = color('cyan');
 }
-
 
 //This function runs every frame
 function draw() {
@@ -540,40 +552,53 @@ function draw() {
 		textSize(16*textScaleFactor);
 		//text("Bullets: " + (bulletQty - bulletIndex), width / 4, height/15);
 
-		//control player by dragging with mouse
+		//control player by dragging with mouse or touch
 		if (isPlayerDragged) {
-			//print("Current pos:" + player.position.x + ", " + player.position.y);
+			//print("Current pos:" + player.position.x + ", " + player.position.y); //debugging data
+
+			//newX and newY are what will be the new position of the player sprite after the code runs
 			var newX = mouseX + offsetX;
+
+			//check that newX position is within the boundaries of the game canvas, if not set it to boundary limit
 			if(newX > width - playerSize/2){
 				newX = width - playerSize/2;
 			}
+			//check that newX position is within the boundaries of the game canvas, if not set it to boundary limit
 			if(newX < playerSize/2){
 				newX = playerSize/2;
 			}
 
 			var newY = mouseY + offsetY;
+
+			//check that newX position is within the boundaries of the game canvas, if not set it to boundary limit
 			if(newY > height - playerSize/2){
 				newY = height - playerSize/2;
 			}
+			//check that newX position is within the boundaries of the game canvas, if not set it to boundary limit
 			if(newY < playerSize/2){
 				newY = playerSize/2;
 			}
 
+			//finally set the player position to newX and newY
 			player.position.x = newX;
 			player.position.y = newY;
 		}
 
 		//control player with arrows or WSAD
 		if ((keyDown(RIGHT_ARROW) || keyDown(68)) && player.position.x < (width - playerSize/2)) {
+			//right arrow or "D" was pressed, move player using accelFactor right until boundary limit
 			player.position.x = player.position.x + playerAccelFactor;
 		}
 		if ((keyDown(LEFT_ARROW) || keyDown(65)) && player.position.x > playerSize/2) {
+			//left arrow or "A" was pressed, move player using accelFactor right until boundary limit
 			player.position.x = player.position.x - playerAccelFactor;
 		}
 		if ((keyDown(DOWN_ARROW) || keyDown(83)) && player.position.y < (height - playerSize/2)) {
+			//down arrow or "S" was pressed, move player using accelFactor right until boundary limit
 			player.position.y = player.position.y + playerAccelFactor;
 		}
 		if ((keyDown(UP_ARROW) || keyDown(87)) && player.position.y > playerSize/2) {
+			//up arrow or "A" was pressed, move player using accelFactor right until boundary limit
 			player.position.y = player.position.y - playerAccelFactor;
 		}
 
@@ -706,8 +731,6 @@ function restartGame(){
 			bullets[i].position.y = height;
 			bullets[i].visible = false;
 		}
-
-
 	}
 }
 
@@ -759,9 +782,13 @@ function keyPressed() {
 //runs when the mouse is clicked or screen is tapped
 function mousePressed() {
 	if(!isGameOver){
-		if (mouseX > player.position.x - (playerWidth)/2 && mouseX < player.position.x + (playerWidth)/2 && mouseY > player.position.y - (playerHeight)/2 && mouseY < player.position.y + (playerHeight)/2) {
-			//print("clicked on player");
-			isPlayerDragged = true;
+		//check if mouseX and mouseY (place where user clicked or tapped) is within the boundaries of the player character sprite
+		if (mouseX > player.position.x - (playerWidth)/2 && mouseX < player.position.x + 
+				(playerWidth)/2 && mouseY > player.position.y - (playerHeight)/2 && mouseY < player.position.y + (playerHeight)/2) {
+			//print("clicked on player"); //debugging print statement
+			isPlayerDragged = true; //set isPlayerDragged flag true, indicating player is being clicked on
+
+			//set offset variables, indicate the distance from where the user is clicking/tapping to the center of the player sprite
 			offsetX = player.position.x - mouseX;
 			offsetY = player.position.y - mouseY;
 		  }
