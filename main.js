@@ -7,7 +7,13 @@ var database = firebase.database();
 //username variable
 var uname;
 //highscore variable
-var highScore
+var highScore;
+//currency variable (credits)
+var credits;
+//upgrade variables
+var clothMaskPurchased;
+var n95MaskPurchased;
+var boosterShotPurchased;
 
 var hasSignedIn = false;
 var authChecked = false;
@@ -62,6 +68,7 @@ function loadLoadingPage(){
 	//document.getElementById("loadingDiv").style.display = "block";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 }
 
 function loadCreateAcctPage(){
@@ -74,6 +81,7 @@ function loadCreateAcctPage(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 }
 
 function loadLoginPage(){
@@ -86,6 +94,7 @@ function loadLoginPage(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 }
 
 function loadGamePage(){
@@ -98,6 +107,7 @@ function loadGamePage(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 	restartGame();
 }
 
@@ -110,6 +120,7 @@ function loadMainMenu(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 
 	var user = firebase.auth().currentUser;
 	if(user){
@@ -121,6 +132,10 @@ function loadMainMenu(){
 		}
 
 		getUsername();
+
+		getCredits();
+
+		getPurchases();
 	}
 }
 
@@ -133,6 +148,7 @@ function loadLeaderboard(){
 	document.getElementById("leaderboard").style.display = "block";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "none";
 }
 
 function loadSettingsPage(){
@@ -144,7 +160,7 @@ function loadSettingsPage(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "block";
 	document.getElementById("changeUsername").style.display = "none";
-
+	document.getElementById("store").style.display = "none";
 	document.getElementById("changeUserDisplay").innerHTML = "Current username: " + uname;
 }
 
@@ -157,6 +173,25 @@ function loadChangeUsernamePage(){
 	document.getElementById("leaderboard").style.display = "none";
 	document.getElementById("settings").style.display = "none";
 	document.getElementById("changeUsername").style.display = "block";
+	document.getElementById("store").style.display = "none";
+}
+
+function loadStorePage(){
+	visiblePage = "store";
+	document.getElementById("login").style.display = "none";
+	document.getElementById("createAcct").style.display = "none";
+	document.getElementById("gameDiv").style.display = "none";
+	document.getElementById("mainMenu").style.display = "none";
+	document.getElementById("leaderboard").style.display = "none";
+	document.getElementById("settings").style.display = "none";
+	document.getElementById("changeUsername").style.display = "none";
+	document.getElementById("store").style.display = "block";
+
+	var user = firebase.auth().currentUser;
+	if(user){
+		getCredits();
+		getPurchases();
+	}
 }
 
 function createAccount(){
@@ -167,13 +202,25 @@ function createAccount(){
 
 		firebase.auth().createUserWithEmailAndPassword(email, password)
 		.then((userCredential) => {
-		// Signed in 
-		var user = userCredential.user;
+			// Signed in 
+			var user = userCredential.user;
 
-		uname = username;
-		highScore = 0;
-		writeUserHighScore(0);
-		writeUsername(username);
+			uname = username;
+			highScore = 0;
+			credits = 0;
+			n95MaskPurchased = 0;
+			clothMaskPurchased = 0;
+			boosterShotPurchased = 0;
+
+			var userId = firebase.auth().currentUser.uid;
+			firebase.database().ref('users/'+userId).set({
+				username: uname,
+				highScore: highScore,
+				credits: credits,
+				n95MaskPurchased: n95MaskPurchased,
+				clothMaskPurchased: clothMaskPurchased,
+				boosterShotPurchased: boosterShotPurchased
+			});
 		})
 		.catch((error) => {
 		var errorCode = error.code;
@@ -239,11 +286,19 @@ function writeUserHighScore(newHighScore) {
 		if(!uname){
 			getUsername();
 		}
+		if(!credits){
+			getCredits();
+		}
+		getPurchases();
 		highScore = newHighScore;
 		var userId = firebase.auth().currentUser.uid;
 		firebase.database().ref('users/'+userId).set({
 			username: uname,
-			highScore: highScore
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
 		});
 	}
 }
@@ -254,12 +309,133 @@ function writeUsername(newUsername) {
 		if(!highScore){
 			getHighScore();
 		}
+		if(!credits){
+			getCredits();
+		}
+		getPurchases();
 		uname = newUsername;
 		var userId = firebase.auth().currentUser.uid;
 		firebase.database().ref('users/'+userId).set({
 			username: uname,
-			highScore: highScore
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
 		});
+	}
+}
+
+function writeUserCredits(newCredits) {
+	if(newCredits){
+		var user = firebase.auth().currentUser;
+		if(!uname){
+			getUsername();
+		}
+		if(!highScore){
+			getHighScore();
+		}
+		getPurchases();
+		credits = newCredits;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
+		});
+	}
+}
+
+function writeClothMaskPurchased(){
+	var user = firebase.auth().currentUser;
+	if(!uname){
+		getUsername();
+	}
+	if(!highScore){
+		getHighScore();
+	}
+	if(!credits){
+		getCredits();
+	}
+	getPurchases();
+	if(credits >= 100){
+		credits -= 100;
+		clothMaskPurchased++;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
+		});
+	}
+	else{
+		alert("Not enough credits to buy item.");
+	}
+}
+
+function writeN95MaskPurchased(){
+	var user = firebase.auth().currentUser;
+	if(!uname){
+		getUsername();
+	}
+	if(!highScore){
+		getHighScore();
+	}
+	if(!credits){
+		getCredits();
+	}
+	getPurchases();
+	if(credits >= 300){
+		credits -= 300;
+		n95MaskPurchased++;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
+		});
+	}
+	else{
+		alert("Not enough credits to buy item.");
+	}
+}
+
+function writeBoosterShotPurchased(){
+	var user = firebase.auth().currentUser;
+	if(!uname){
+		getUsername();
+	}
+	if(!highScore){
+		getHighScore();
+	}
+	if(!credits){
+		getCredits();
+	}
+	getPurchases();
+	if(credits >= 500){
+		credits -= 500;
+		boosterShotPurchased++;
+		var userId = firebase.auth().currentUser.uid;
+		firebase.database().ref('users/'+userId).set({
+			username: uname,
+			highScore: highScore,
+			credits: credits,
+			n95MaskPurchased: n95MaskPurchased,
+			clothMaskPurchased: clothMaskPurchased,
+			boosterShotPurchased: boosterShotPurchased
+		});
+	}
+	else{
+		alert("Not enough credits to buy item.");
 	}
 }
 
@@ -294,6 +470,31 @@ function getHighScore(){
 	}
 }
 
+function getCredits(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			credits = (snapshot.val() && snapshot.val().credits);
+			document.getElementById("credits").innerHTML = credits + ' <i class="fas fa-tint"></i>';
+			document.getElementById("creditsStore").innerHTML = credits + ' <i class="fas fa-tint"></i>';
+		});
+	}
+}
+
+function getPurchases(){
+	if(hasSignedIn){
+		var userId = firebase.auth().currentUser.uid;
+		return firebase.database().ref('users/'+userId ).once('value').then((snapshot) => {
+			n95MaskPurchased = (snapshot.val() && snapshot.val().n95MaskPurchased);
+			clothMaskPurchased = (snapshot.val() && snapshot.val().clothMaskPurchased);
+			boosterShotPurchased = (snapshot.val() && snapshot.val().boosterShotPurchased);
+			document.getElementById("clothMaskQtyPurchased").innerHTML = "<small>Quantity available: " + clothMaskPurchased + "</small>";
+			document.getElementById("n95MaskQtyPurchased").innerHTML = "<small>Quantity available: " + n95MaskPurchased + "</small>";
+			document.getElementById("boosterShotQtyPurchased").innerHTML = "<small>Quantity available: " + boosterShotPurchased + "</small>";
+		});
+	}
+}
+
 let leaderboardBody = document.getElementById("leaderboardBody");
 leaderboardBody.innerHTML = "";
 let db = firebase.database().ref();
@@ -324,36 +525,28 @@ function sortTable() {
 	var table, rows, switching, i, x, y, shouldSwitch;
 	table = document.getElementById("leaderboardTable");
 	switching = true;
-	/*Make a loop that will continue until
-	no switching has been done:*/
+
 	while (switching) {
-	  //start by saying: no switching is done:
-	  switching = false;
-	  rows = table.rows;
-	  /*Loop through all table rows (except the
-	  first, which contains table headers):*/
-	  for (i = 1; i < (rows.length - 1); i++) {
-		//start by saying there should be no switching:
-		shouldSwitch = false;
-		/*Get the two elements you want to compare,
-		one from current row and one from the next:*/
-		x = rows[i].getElementsByTagName("TD")[0];
-		y = rows[i + 1].getElementsByTagName("TD")[0];
-		//check if the two rows should switch place:
-		if (Number(x.innerHTML) < Number(y.innerHTML)) {
-		  //if so, mark as a switch and break the loop:
-		  shouldSwitch = true;
-		  break;
+		switching = false;
+		rows = table.rows;
+
+		for (i = 1; i < (rows.length - 1); i++) {
+			shouldSwitch = false;
+
+			x = rows[i].getElementsByTagName("TD")[0];
+			y = rows[i + 1].getElementsByTagName("TD")[0];
+
+			if (Number(x.innerHTML) < Number(y.innerHTML)) {
+			shouldSwitch = true;
+			break;
+			}
 		}
-	  }
-	  if (shouldSwitch) {
-		/*If a switch has been marked, make the switch
-		and mark that a switch has been done:*/
-		rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-		switching = true;
-	  }
+		if (shouldSwitch) {
+			rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+			switching = true;
+		}
 	}
-  }
+}
 
 
 //** 	Game Code	 *//
@@ -371,7 +564,7 @@ var isPlayerDragged;
 
 //bullet variables
 var bullets;
-var bulletQty;
+var bulletQty = 0;
 var bulletIndex;
 var bulletQtyBar;
 var bulletRefill;
@@ -382,8 +575,10 @@ var enemyQty;
 
 //gameplay variables
 var firstRun;
+var firstRunLoggedIn;
 var isGameOver;
 var score;
+var lastScoreCreditsWereGiven;
 var highScore;
 
 //scale variables
@@ -403,7 +598,9 @@ var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 //Don't allow page to be moved or zoomed in on mobile
 function preventBehavior(e) {
-    e.preventDefault(); 
+	if(visiblePage != "leaderboard" || visiblePage != "store"){
+		e.preventDefault(); 
+	}
 };
 document.addEventListener("touchmove", preventBehavior, {passive: false});
 
@@ -423,10 +620,10 @@ function setup() {
 		movLimScaleFactor = 1;
 	}
 
-	if(isMobile){
+	//if(isMobile){
 		//Disable pixel scaling (reduces quality) to improve performance on mobile
 		//pixelDensity(1);
-	}
+	//}
 
 	frameRate(60);
 
@@ -463,15 +660,7 @@ function setup() {
 	}
 
 	bullets = [];
-	bulletQty = 50;
-	bulletIndex = 0;
 
-	for (i = 0; i < bulletQty; i++) {
-		var bullet = createSprite(width/2, height, 10*spriteScaleFactor, 10*spriteScaleFactor);
-		bullet.shapeColor = color('cyan');
-		bullet.visible = false;
-		bullets.push(bullet);
-	}
 
 	bulletRefill = createSprite(width/2, 0, 20*spriteScaleFactor, 20*spriteScaleFactor);
 	bulletRefill.shapeColor = color('cyan');
@@ -484,10 +673,30 @@ function setup() {
 //This function runs every frame
 function draw() {
 	if(uname){
+		if(firstRunLoggedIn){
+			if(boosterShotPurchased){
+				bulletQty = 50+(10*boosterShotPurchased);
+			}
+			else{
+				bulletQty = 50;
+			}
+			bulletIndex = 0;
+		
+			for (i = 0; i < bulletQty; i++) {
+				var bullet = createSprite(width/2, height, 10*spriteScaleFactor, 10*spriteScaleFactor);
+				bullet.shapeColor = color('cyan');
+				bullet.visible = false;
+				bullets.push(bullet);
+			}
+
+			firstRunLoggedIn = false;
+		}
+
 		document.getElementById("playBtn").disabled = false;
+		document.getElementById("storeBtn").disabled = false;
 		document.getElementById("settingsBtn").disabled = false;
 	}
-	//console.log(getHighScore());
+	console.log(bulletQty);
 
 	//console.log(score);
 
@@ -517,16 +726,52 @@ function draw() {
 	else if(isGameOver && visiblePage == "login"){
 		loadLoginPage();
 	}
+	else if(isGameOver && visiblePage == "store"){
+		loadStorePage();
+	}
     else {
 		for (i = 0; i < enemyQty; i++) {
 			if(enemies[i].overlap(player)){
-				isGameOver = true;
-				loadMainMenu();
+				if(n95RoundLives+clothMaskPurchased > 0){
+					enemies[i].position.y = 0;
+					enemies[i].position.x = random(5, width-5);
+
+					if(clothMaskPurchased != 0){
+						clothMaskPurchased--;
+						var user = firebase.auth().currentUser;
+						if(!uname){
+							getUsername();
+						}
+						if(!highScore){
+							getHighScore();
+						}
+						if(!credits){
+							getCredits();
+						}
+						getPurchases();
+						var userId = firebase.auth().currentUser.uid;
+						firebase.database().ref('users/'+userId).set({
+							username: uname,
+							highScore: highScore,
+							credits: credits,
+							n95MaskPurchased: n95MaskPurchased,
+							clothMaskPurchased: clothMaskPurchased,
+							boosterShotPurchased: boosterShotPurchased
+						});
+					}
+					else{
+						n95RoundLives--;
+					}
+				}
+				else{
+					isGameOver = true;
+					loadMainMenu();
+				}
 			}
 		}
 		for(i = 0; i < bulletQty; i++){
 			for(j = 0; j < enemyQty; j++){
-				if(bullets[i].overlap(enemies[j])){
+				if(bullets[i].overlap(enemies[j]) && bullets[i].visible == true){
 					enemies[j].position.y = 0;
 					enemies[j].position.x = random(5, width-5);
 					
@@ -536,6 +781,15 @@ function draw() {
 					bullets[i].visible = false;
 
 					score++;
+					if (score % 10 === 0 && lastScoreCreditsWereGiven != score){
+						lastScoreCreditsWereGiven = score;
+						var newCredStr = score.toString();
+						newCredStr = newCredStr.substring(0, newCredStr.length-1);
+						var newCredInt = parseInt(newCredStr);
+						//console.log("Credits increased from " + credits + " to " + (credits + newCredInt) + " by " + newCredInt);
+						credits += newCredInt;
+						writeUserCredits(credits);
+					}
 				}
 			}
 		}
@@ -546,11 +800,13 @@ function draw() {
 
 		background(0, 0, 51);
 		fill("white");
-		textSize(32*textScaleFactor);
 		textAlign(CENTER, CENTER);
+		textSize(20*textScaleFactor);
+		text("Lives: " + (n95RoundLives + clothMaskPurchased), width / 5.2, height/15);
+		textSize(40*textScaleFactor);
 		text(score, width / 2, height/15);
-		textSize(16*textScaleFactor);
-		//text("Bullets: " + (bulletQty - bulletIndex), width / 4, height/15);
+		textSize(20*textScaleFactor);
+		text(credits + "Cr", width / 1.2, height/15);
 
 		//control player by dragging with mouse or touch
 		if (isPlayerDragged) {
@@ -663,13 +919,13 @@ function showStartScreen() {
 	var user = firebase.auth().currentUser;
 	if(user){
 		getHighScore();
-		
+		getUsername();
+		getCredits();
+
 		if(score > highScore){
 			highScore = score;
 			writeUserHighScore(highScore);
 		}
-
-		getUsername();
 	}
 
 	background(0);
@@ -713,7 +969,9 @@ function restartGame(){
 			writeUserHighScore(score);
 		}
 		score = 0;
+		n95RoundLives = n95MaskPurchased;
 		firstRun = true;
+		firstRunLoggedIn = true;
 		isGameOver = false;
 		player.position.x = width/2;
 		player.position.y = height-(height/8);
@@ -734,7 +992,7 @@ function restartGame(){
 	}
 }
 
-/*	This function is called when the space key is pressed, or when the player is double tapped
+/*	This function is called based on time elapsed,
 	it moves a bullet to the player's position, and gives it a velocity vector going
 	upward at a velocity of 10, and sets the width of the bulletQtyBar to the width of the screen times
 	the current bullets available divided by the total amount of bullets, which will be a percentage,

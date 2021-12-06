@@ -6,7 +6,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>Vaccine Strikes Back</title>
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <!-- Google Fonts Roboto -->
     <link
         rel="stylesheet"
@@ -14,6 +14,16 @@
     />
     <!-- Material Design Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6ZQ89MWZF1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6ZQ89MWZF1');
+    </script>
   </head>
   <body class="bg-dark text-white" style="
       -webkit-touch-callout: none;
@@ -119,11 +129,11 @@
             <h1>The Vaccine Strikes Back</h1>
           </div>
           <div class="p-2" style="margin-top: 25px; margin-bottom: 25px;">
-            <button type="button" id="storeBtn" class="btn btn-lg btn-primary btn-rounded" style="margin-right: 50px;" disabled><i class="fas fa-shopping-bag"></i>&nbsp;&nbsp;&nbsp;Store</button>
+            <button type="button" id="storeBtn" onclick="loadStorePage()" class="btn btn-lg btn-primary btn-rounded" style="margin-right: 50px;" disabled><i class="fas fa-shopping-bag"></i>&nbsp;&nbsp;&nbsp;Store</button>
             <button type="button" id="playBtn" onclick="loadGamePage()" class="btn btn-lg btn-primary btn-rounded" disabled><i class="fas fa-play"></i>&nbsp;&nbsp;&nbsp;Play</button>
           </div>
           <div class="p-2" style="margin-top: 25px">
-            <h3 id="playerCash">$0</h3>
+            <h3 id="credits"></h3>
           </div>
           <div class="p-2" style="margin-bottom: 25px;">
             <h3 id="highScore">&nbsp;</h3>
@@ -195,6 +205,81 @@
           <div class="p-2" style="margin-top: 10px;">
             <div class="d-flex justify-content-end">
               <button type="button" onclick="updateUsername()" class="btn btn-primary btn-rounded">SUBMIT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="store" style="display: none;">
+      <div class="d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 100px;">
+        <div class="d-flex text-center flex-column mb-3">
+          <div class="p-2 d-flex justify-content-around">
+            <button type="button" onclick="loadMainMenu()" style="background:none; border:none; margin:0; padding-bottom:10px; cursor: pointer; margin-right: 30px; font-size: x-large;" class="text-white"><i class="fas fa-arrow-left"></i></button>
+            <h2>Store</h2>
+            <a class="text-dark" style="margin-right: 10px; font-size: x-large; visibility: hidden;" href="" role="button">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+          </div>
+          <div class="p-2 d-flex justify-content-around" style="margin-top: 25px;">
+            <h5 id="creditsStore"></h5>
+          </div>
+          <div class="p-2" style="margin-top: 40px">
+            <div class="card text-white bg-dark mb-3 d-flex" style="max-width: 25rem; background-color: rgb(61, 61, 61)  !important;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between p-md-1">
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center">
+                      <i class="far fa-heart text-danger fa-2x me-4"></i>
+                    </div>
+                    <div class="text-start">
+                      <h5>Cloth Mask</h5>
+                      <p class="mb-0"><small>Adds an extra life for one round</small></p>
+                      <p class="mb-0" id="clothMaskQtyPurchased"><small>Quantity available: 0</small></p>
+                    </div>
+                  </div>
+                  <div class="align-self-center">
+                    <button type="button" onclick="writeClothMaskPurchased()" class="btn btn-primary btn-rounded" style="margin-left: 25px; min-width: 80px; padding:10px;">100&nbsp;&nbsp;&nbsp;<i class="fas fa-tint"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card text-white bg-dark mb-3 d-flex" style="max-width: 25rem; background-color: rgb(61, 61, 61)  !important;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between p-md-1">
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center">
+                      <i class="fas fa-heart text-danger fa-2x me-4"></i>
+                    </div>
+                    <div class="text-start">
+                      <h5>N95 Respirator</h5>
+                      <p class="mb-0"><small>Adds an extra life permanently</small></p>
+                      <p class="mb-0" id="n95MaskQtyPurchased"><small>Quantity available: 0</small></p>
+                    </div>
+                  </div>
+                  <div class="align-self-center">
+                    <button type="button" onclick="writeN95MaskPurchased()" class="btn btn-primary btn-rounded" style="margin-left: 25px; min-width: 80px; padding:10px;">300&nbsp;&nbsp;&nbsp;<i class="fas fa-tint"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card text-white bg-dark mb-3 d-flex" style="max-width: 25rem; background-color: rgb(61, 61, 61)  !important;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between p-md-1">
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center">
+                      <i class="fas fa-syringe text-info fa-2x me-4"></i>
+                    </div>
+                    <div class="text-start">
+                      <h5>Booster Shot</h5>
+                      <p class="mb-0"><small>Adds 10 bullets to your firing capacity</small></p>
+                      <p class="mb-0" id="boosterShotQtyPurchased"><small>Quantity available: 0</small></p>
+                    </div>
+                  </div>
+                  <div class="align-self-center">
+                    <button type="button" onclick="writeBoosterShotPurchased()" class="btn btn-primary btn-rounded" style="margin-left: 25px; min-width: 80px; padding:10px;">500&nbsp;&nbsp;&nbsp;<i class="fas fa-tint"></i></button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
