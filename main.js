@@ -564,7 +564,7 @@ var isPlayerDragged;
 
 //bullet variables
 var bullets;
-var bulletQty = 0;
+var bulletQty;
 var bulletIndex;
 var bulletQtyBar;
 var bulletRefill;
@@ -661,7 +661,6 @@ function setup() {
 
 	bullets = [];
 
-
 	bulletRefill = createSprite(width/2, 0, 20*spriteScaleFactor, 20*spriteScaleFactor);
 	bulletRefill.shapeColor = color('cyan');
 	bulletRefill.visible = false;
@@ -673,30 +672,10 @@ function setup() {
 //This function runs every frame
 function draw() {
 	if(uname){
-		if(firstRunLoggedIn){
-			if(boosterShotPurchased){
-				bulletQty = 50+(10*boosterShotPurchased);
-			}
-			else{
-				bulletQty = 50;
-			}
-			bulletIndex = 0;
-		
-			for (i = 0; i < bulletQty; i++) {
-				var bullet = createSprite(width/2, height, 10*spriteScaleFactor, 10*spriteScaleFactor);
-				bullet.shapeColor = color('cyan');
-				bullet.visible = false;
-				bullets.push(bullet);
-			}
-
-			firstRunLoggedIn = false;
-		}
-
 		document.getElementById("playBtn").disabled = false;
 		document.getElementById("storeBtn").disabled = false;
 		document.getElementById("settingsBtn").disabled = false;
 	}
-	console.log(bulletQty);
 
 	//console.log(score);
 
@@ -977,6 +956,21 @@ function restartGame(){
 		player.position.y = height-(height/8);
 		bulletIndex = 0;
 		bulletQtyBar.width = width;
+
+		if(boosterShotPurchased){
+			bulletQty = 50+(10*boosterShotPurchased);
+		}
+		else{
+			bulletQty = 50;
+		}
+
+		bullets = [];
+		for (i = 0; i < bulletQty; i++) {
+			var bullet = createSprite(width/2, height, 10*spriteScaleFactor, 10*spriteScaleFactor);
+			bullet.shapeColor = color('cyan');
+			bullet.visible = false;
+			bullets.push(bullet);
+		}
 
 		for (i = 0; i < enemyQty; i++) {
 			enemies[i].position.x = width/2;
